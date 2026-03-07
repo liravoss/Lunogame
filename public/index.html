@@ -1,0 +1,246 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <title>LUNO — Multiplayer UNO</title>
+</head>
+<body>
+
+<!-- ─── Background ─── -->
+<div id="bg">
+  <div id="bg-img"></div>
+  <div id="bg-overlay"></div>
+  <canvas id="stars"></canvas>
+  <!-- Dazzle particles on front page -->
+  <div id="dazzle-wrap"></div>
+</div>
+
+<!-- ─── Auth Panel ─── -->
+<div id="auth-overlay" class="overlay active">
+  <!-- Shining orbs -->
+  <div class="auth-shine auth-shine-1"></div>
+  <div class="auth-shine auth-shine-2"></div>
+  <div class="auth-shine auth-shine-3"></div>
+
+  <div class="glass-panel auth-panel">
+    <!-- Sparkle border -->
+    <div class="panel-sparkle-tl">✦</div>
+    <div class="panel-sparkle-tr">✦</div>
+    <div class="panel-sparkle-bl">✦</div>
+    <div class="panel-sparkle-br">✦</div>
+
+    <div class="logo-wrap">
+      <div class="mascot-wrap">
+        <img src="images/mascot.png" class="mascot-img" alt="LUNO">
+        <div class="mascot-glow"></div>
+        <div class="mascot-ring"></div>
+      </div>
+      <h1 class="logo-text">LUNO</h1>
+      <p class="logo-sub">✦ Fun to play game ✦</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="login">Login</button>
+      <button class="tab-btn" data-tab="register">Register</button>
+    </div>
+
+    <div id="tab-login" class="tab-content active">
+      <div class="input-group">
+        <label>Username</label>
+        <input type="text" id="login-username" placeholder="Enter username" autocomplete="username">
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Enter password" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary" id="login-btn">🚀 Login</button>
+      <p class="auth-hint">No account? <span class="link" id="guest-btn">Play as Guest</span></p>
+    </div>
+
+    <div id="tab-register" class="tab-content">
+      <div class="input-group">
+        <label>Username <span class="hint">(letters, numbers, _)</span></label>
+        <input type="text" id="reg-username" placeholder="Choose username" autocomplete="username">
+      </div>
+      <div class="input-group">
+        <label>Password <span class="hint">(min 4 chars)</span></label>
+        <input type="password" id="reg-password" placeholder="Choose password" autocomplete="new-password">
+      </div>
+      <div class="input-group">
+        <label>Profile Picture <span class="hint">(optional)</span></label>
+        <div class="pfp-wrap">
+          <div class="pfp-preview" id="pfp-preview"><span>+</span></div>
+          <div class="pfp-info">
+            <p>Upload a photo</p>
+            <button class="btn btn-sm" id="pfp-upload-btn">Choose Image</button>
+            <input type="file" id="pfp-file" accept="image/*" style="display:none">
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="register-btn">✨ Create Account</button>
+    </div>
+    <div id="auth-error" class="error-msg"></div>
+  </div>
+</div>
+
+<!-- ─── Lobby ─── -->
+<div id="lobby-overlay" class="overlay">
+  <div class="glass-panel lobby-panel">
+    <div class="lobby-header">
+      <div>
+        <h2 class="room-title" id="lobby-room-name">Finding Room…</h2>
+        <p class="lobby-subtitle">LUNO · Multiplayer</p>
+      </div>
+      <div class="player-count-badge" id="lobby-count">0/10</div>
+    </div>
+    <div class="lobby-user-row">
+      <div class="my-pfp-wrap">
+        <div class="pfp-circle" id="lobby-my-pfp"></div>
+        <div>
+          <p class="my-name" id="lobby-my-name">Player</p>
+          <p class="my-status">That's you! ✨</p>
+        </div>
+      </div>
+      <div class="profile-actions">
+        <button class="btn btn-sm" id="change-pfp-btn">📸 PFP</button>
+        <input type="file" id="change-pfp-file" accept="image/*" style="display:none">
+        <button class="btn btn-sm" id="scores-from-lobby-btn">🏆 Scores</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <p class="section-label">Players in Room</p>
+    <div id="player-list" class="player-list"></div>
+    <div class="lobby-footer">
+      <div id="waiting-msg" class="waiting-msg">
+        <div class="spinner"></div>
+        <span id="waiting-text">Waiting for room…</span>
+      </div>
+      <button class="btn btn-start" id="start-btn" style="display:none">⚡ START GAME</button>
+      <p class="start-hint" id="start-hint"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Scoreboard ─── -->
+<div id="scoreboard-overlay" class="overlay modal-overlay">
+  <div class="glass-panel scoreboard-panel">
+    <div class="panel-header">
+      <h2>🏆 LUNO Leaderboard</h2>
+      <button class="close-btn" id="scoreboard-close">✕</button>
+    </div>
+    <div id="scoreboard-list" class="scoreboard-list"><div class="loading-msg">Loading…</div></div>
+  </div>
+</div>
+
+<!-- ─── Color Picker ─── -->
+<div id="color-picker-overlay" class="overlay modal-overlay">
+  <div class="glass-panel color-panel">
+    <p class="color-label">✨ Choose a Color</p>
+    <div class="color-grid">
+      <button class="color-btn" data-color="red"    style="--c:#ff4757">🔴 Red</button>
+      <button class="color-btn" data-color="blue"   style="--c:#2196F3">🔵 Blue</button>
+      <button class="color-btn" data-color="green"  style="--c:#2ed573">🟢 Green</button>
+      <button class="color-btn" data-color="yellow" style="--c:#ffd700">🟡 Yellow</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Win Screen ─── -->
+<div id="win-overlay" class="overlay modal-overlay">
+  <div class="glass-panel win-panel">
+    <div id="confetti-wrap"></div>
+    <div id="win-crown" class="win-crown">👑</div>
+    <div class="win-trophy-wrap">
+      <div class="win-trophy-ring"></div>
+      <div class="win-trophy">🏆</div>
+    </div>
+    <h2 id="win-title">Player Wins!</h2>
+    <p id="win-points" class="win-points">+0 points</p>
+    <div class="win-stars">⭐⭐⭐</div>
+    <div class="win-btns">
+      <button class="btn btn-primary" id="play-again-btn">🔄 Play Again</button>
+      <button class="btn btn-leave"   id="leave-btn">🚪 Leave</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Floating Reactions ─── -->
+<div id="floating-reactions"></div>
+
+<!-- ─── Game Canvas ─── -->
+<div id="canvas-wrap">
+  <canvas id="canvas" width="1000" height="600"></canvas>
+</div>
+
+<!-- ─── Player Panel ─── -->
+<div id="player-panel" style="display:none">
+  <div class="pp-header">
+    <span class="pp-title">PLAYERS</span>
+    <span class="pp-room" id="pp-room-name">Room_1</span>
+  </div>
+  <div id="pp-list"></div>
+</div>
+
+<!-- ─── Chat Panel ─── -->
+<div id="chat-panel" style="display:none">
+  <div class="chat-header" id="chat-toggle">
+    <span>💬 Chat</span>
+    <span id="chat-unread" class="chat-unread" style="display:none">0</span>
+    <span class="chat-chevron" id="chat-chevron">▲</span>
+  </div>
+  <div id="chat-body" class="chat-body">
+    <div id="chat-messages" class="chat-messages"></div>
+
+    <!-- Reaction bar -->
+    <div class="reaction-bar" id="reaction-bar">
+      <button class="rxn-btn" data-key="lol"     title="lol">😂</button>
+      <button class="rxn-btn" data-key="love"    title="love">❤️</button>
+      <button class="rxn-btn" data-key="shocked" title="shocked">😱</button>
+      <button class="rxn-btn" data-key="sad"     title="sad">😢</button>
+      <button class="rxn-btn" data-key="yeah"    title="yeah">🎉</button>
+      <button class="rxn-btn" data-key="ok"      title="ok">👍</button>
+      <button class="rxn-btn" data-key="punch"   title="punch">👊</button>
+      <button class="rxn-btn" data-key="pat"     title="pat">🤗</button>
+      <button class="rxn-btn" data-key="jumping" title="jumping">🙌</button>
+      <button class="rxn-btn" data-key="sleepy"  title="sleepy">😴</button>
+      <button class="rxn-btn" data-key="bye"     title="bye">👋</button>
+      <button class="rxn-btn" data-key="cow"     title="cow">🐄</button>
+    </div>
+
+    <div class="chat-input-row">
+      <input type="text" id="chat-input" placeholder="Type a message…" maxlength="200" autocomplete="off">
+      <button class="btn btn-send" id="chat-send">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── HUD ─── -->
+<div id="hud" style="display:none">
+  <div id="hud-top">
+    <div class="hud-brand">LUNO</div>
+    <div class="hud-room" id="hud-room-name">Room_1</div>
+    <div class="hud-controls">
+      <button class="btn btn-sm hud-btn" id="vc-btn" title="Voice Chat">🎙️ VC</button>
+      <button class="btn btn-sm hud-btn" id="scoreboard-btn">🏆</button>
+      <button class="btn btn-sm hud-btn btn-danger" id="hud-leave-btn">🚪</button>
+    </div>
+  </div>
+  <div id="vc-bar" style="display:none">
+    <div id="vc-users-row"></div>
+    <button class="btn btn-sm" id="vc-mute-btn">🎙️ Mute</button>
+    <button class="btn btn-sm btn-danger" id="vc-leave-btn">Leave VC</button>
+  </div>
+  <div id="turn-banner" class="turn-banner" style="display:none">⚡ YOUR TURN!</div>
+  <button class="btn btn-uno" id="uno-btn" style="display:none">UNO!</button>
+  <div id="notify-banner" class="notify-banner"></div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/main.js"></script>
+</body>
+</html>
